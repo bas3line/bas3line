@@ -2,6 +2,7 @@
 // reader sees Geist, whatever is installed), the two themes, and small parts.
 import opentype from "opentype.js";
 import { readFileSync } from "node:fs";
+import { siFfmpeg, siReact, siTailwindcss } from "simple-icons";
 
 const dir = new URL("./node_modules/geist/dist/fonts/", import.meta.url);
 const load = (p) => opentype.parse(readFileSync(new URL(p, dir)).buffer);
@@ -105,8 +106,12 @@ export function paragraph(str, { x, y, max, lineHeight, ...opts }) {
 
 export const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
+// Hairlines (strokes with no width set) stay one screen pixel wide however
+// far GitHub scales the image down, instead of blurring into 0.6px greys.
+const CRISP = `path:not([stroke-width]),rect:not([stroke-width]),circle:not([stroke-width]){vector-effect:non-scaling-stroke}`;
+
 export function doc({ w, h, label, t, body, style = "", bg = true }) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${esc(label)}" fill="none"><title>${esc(label)}</title><style>${style}@media (prefers-reduced-motion:reduce){*{animation:none!important}.motion{display:none}}</style>${bg ? `<rect width="${w}" height="${h}" fill="${t.bg}"/>` : ""}${body}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${esc(label)}" fill="none"><title>${esc(label)}</title><style>${CRISP}${style}@media (prefers-reduced-motion:reduce){*{animation:none!important}.motion{display:none}}</style>${bg ? `<rect width="${w}" height="${h}" fill="${t.bg}"/>` : ""}${body}</svg>`;
 }
 
 // a dotted-grid fill, turtle's panel texture
@@ -124,13 +129,63 @@ export function panel(id, t, { x, y, w, h, rim = 12, rx = 14 }) {
   );
 }
 
-// a pill chip with mono text; returns { svg, width }
+// ---------------------------------------------------------------- logos
+// The repo's own marks first: assets/tech (from yshubham.com) and assets/icons,
+// with a -dark twin where one exists. simple-icons (CC0) fills the gaps.
+const assets = new URL("../../assets/", import.meta.url);
+const SIMPLE = { react: siReact, tailwind: siTailwindcss, ffmpeg: siFfmpeg };
+const svgFile = (p) => {
+  try {
+    return readFileSync(new URL(p, assets), "utf8");
+  } catch {
+    return null;
+  }
+};
+
+// a logo as markup for an <image href>, or null; `recolor` swaps the
+// #1f2328 ink of the lucide icons for another colour
+export function logo(name, t, { recolor } = {}) {
+  let src = null;
+  if (SIMPLE[name]) {
+    const s = SIMPLE[name];
+    src = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#${s.hex}" d="${s.path}"/></svg>`;
+  } else {
+    for (const dir of ["tech", "icons", "chips"]) {
+      src = (t.dark && svgFile(`${dir}/${name}-dark.svg`)) || svgFile(`${dir}/${name}.svg`);
+      if (src) break;
+    }
+  }
+  if (!src) return null;
+  if (recolor) src = src.replaceAll("#1f2328", recolor);
+  return `data:image/svg+xml;base64,${Buffer.from(src).toString("base64")}`;
+}
+
+export const image = (href, x, y, s) => `<image x="${r1(x)}" y="${r1(y)}" width="${s}" height="${s}" href="${href}"/>`;
+
+// a five-pointed star, for a star count
+export function star(cx, cy, r, fill) {
+  const pts = [];
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + (i * Math.PI) / 5;
+    const rr = i % 2 ? r * 0.45 : r;
+    pts.push(`${r1(cx + Math.cos(a) * rr)} ${r1(cy + Math.sin(a) * rr)}`);
+  }
+  return `<path d="M${pts.join("L")}Z" fill="${fill}" stroke="${fill}" stroke-width="1" stroke-linejoin="round"/>`;
+}
+
+// a pill chip with mono text, and a logo or a star before it when asked;
+// a label is "text" or { text, logo, star }. Returns { svg, width }
 export function chip(label, t, { x, y, size = 14, h = 30, pad = 12, fill, stroke, ink, font = "mono" } = {}) {
-  const tw = measure(label, { font, size });
-  const w = tw + pad * 2;
-  const svg =
-    `<rect x="${r1(x)}" y="${y}" width="${r1(w)}" height="${h}" rx="${h / 2}" fill="${fill ?? t.card}" stroke="${stroke ?? t.line}"/>` +
-    text(label, { x: x + pad, y: y + h / 2 + size * 0.36, size, font, fill: ink ?? t.ink2 }).svg;
+  const l = typeof label === "string" ? { text: label } : label;
+  const tw = measure(l.text, { font, size });
+  const href = l.logo ? logo(l.logo, t) : null;
+  const icon = href || l.star ? size + 3 : 0;
+  const gap = icon ? 7 : 0;
+  const w = tw + pad * 2 + icon + gap;
+  let svg = `<rect x="${r1(x)}" y="${y}" width="${r1(w)}" height="${h}" rx="${h / 2}" fill="${fill ?? t.card}" stroke="${stroke ?? t.line}"/>`;
+  if (href) svg += image(href, x + pad - 1, y + (h - icon) / 2, icon);
+  if (l.star) svg += star(x + pad - 1 + icon / 2, y + h / 2, icon / 2, t.dark ? "#e3b341" : "#d4a72c");
+  svg += text(l.text, { x: x + pad + icon + gap, y: y + h / 2 + size * 0.36, size, font, fill: ink ?? t.ink2 }).svg;
   return { svg, width: w };
 }
 

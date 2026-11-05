@@ -1,12 +1,13 @@
-// The hero: headline on the left, Sahib Ram's Head of Krishna in ascii on the right.
+// The hero: headline on the left, Rutherfurd's full Moon in ascii on the right.
 import { doc, panel, paragraph, text, measure, esc } from "./lib.mjs";
-import { krishna } from "./art.mjs";
+import { moon } from "./art.mjs";
 
 const W = 1280;
 const H = 780;
+const LINES = ["Fast servers.", "Pretty pages."];
 
 export async function hero(t) {
-  const art = await krishna({ cols: 76 });
+  const art = await moon({ cols: 76 });
   let b = "";
 
   // left column
@@ -19,10 +20,10 @@ export async function hero(t) {
   // headline, sized to the column
   const maxW = 560;
   let size = 96;
-  while (Math.max(measure("Boring servers.", { font: "medium", size, tracking: -0.045 }), measure("Pretty pages.", { font: "medium", size, tracking: -0.045 })) > maxW) size -= 1;
+  while (Math.max(...LINES.map((l) => measure(l, { font: "medium", size, tracking: -0.045 }))) > maxW) size -= 1;
   const lh = size * 1.02;
-  b += text("Boring servers.", { x: lx - 3, y: 186 + size * 0.92, font: "medium", size, tracking: -0.045, fill: t.ink }).svg;
-  b += text("Pretty pages.", { x: lx - 3, y: 186 + size * 0.92 + lh, font: "medium", size, tracking: -0.045, fill: t.blue }).svg;
+  b += text(LINES[0], { x: lx - 3, y: 186 + size * 0.92, font: "medium", size, tracking: -0.045, fill: t.ink }).svg;
+  b += text(LINES[1], { x: lx - 3, y: 186 + size * 0.92 + lh, font: "medium", size, tracking: -0.045, fill: t.blue }).svg;
 
   const by = 186 + size * 0.92 + lh + 66;
   b += paragraph(
@@ -73,14 +74,29 @@ export async function hero(t) {
   b += `<defs><clipPath id="band"><rect x="${ax - 260}" y="${ay - 40}" width="90" height="${rows * ch + 80}" transform="skewX(-18)"><animate attributeName="x" values="${ax - 400};${ax - 400};${ax + cols * cw + 300}" keyTimes="0;0.55;1" dur="7s" repeatCount="indefinite"/></rect></clipPath></defs>`;
   b += `<g class="art motion" fill="${t.glint}" clip-path="url(#band)">${layer((v) => v > 0)}</g>`;
 
+  // a few stars in the empty sky, each on its own slow twinkle
+  let seed = 7;
+  const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  let stars = "";
+  for (let k = 0, tries = 0; k < 16 && tries < 400; tries++) {
+    const r = Math.floor(rand() * rows), c = Math.floor(rand() * cols);
+    const clear = [-2, -1, 0, 1, 2].every((dr) => [-3, -2, -1, 0, 1, 2, 3].every((dc) => !(art.tone[r + dr]?.[c + dc] > 0)));
+    if (!clear) continue;
+    const ch0 = rand() > 0.7 ? "+" : rand() > 0.5 ? "*" : ".";
+    stars += `<text class="star" style="animation-delay:-${(rand() * 4).toFixed(2)}s" x="${(ax + c * cw).toFixed(1)}" y="${(ay + r * ch + ch / 2).toFixed(1)}">${ch0}</text>`;
+    k++;
+  }
+  b += `<g class="art" fill="${t.art[1]}">${stars}</g>`;
+
   // caption, as the landing pages do it
   const capY = py + ph + 30;
-  b += text("Sahib Ram, Head of Krishna, Jaipur, ca. 1800 · The Met, CC0", { x: px, y: capY, font: "mono", size: 14, fill: t.ink3 }).svg;
-  b += text("Painted in Jaipur. Redrawn in ascii, from Jaipur.", { x: px, y: capY + 24, font: "mono", size: 14, fill: t.blue }).svg;
+  b += text("Lewis Morris Rutherfurd, Full Moon, 1871 · The Met, CC0", { x: px, y: capY, font: "mono", size: 14, fill: t.ink3 }).svg;
+  b += text("Four and a half billion years without downtime.", { x: px, y: capY + 24, font: "mono", size: 14, fill: t.blue }).svg;
 
   const style =
     `.art text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:${fontSize}px;white-space:pre;dominant-baseline:central}` +
-    `.caret{animation:blink 1.1s steps(1) infinite}@keyframes blink{50%{opacity:0}}`;
+    `.caret{animation:blink 1.1s steps(1) infinite}@keyframes blink{50%{opacity:0}}` +
+    `.star{animation:twinkle 4s ease-in-out infinite}@keyframes twinkle{0%,100%{opacity:.25}50%{opacity:1}}`;
 
   const height = Math.max(H, capY + 76);
 
@@ -94,7 +110,7 @@ export async function hero(t) {
     w: W,
     h: height,
     t,
-    label: "Boring servers. Pretty pages. Shubham, a systems engineer from Jaipur, beside Sahib Ram's Head of Krishna drawn in ascii.",
+    label: "Fast servers. Pretty pages. Shubham, a systems engineer from Jaipur, beside Rutherfurd's 1871 photograph of the full Moon drawn in ascii.",
     style,
     body: frame + b,
   });

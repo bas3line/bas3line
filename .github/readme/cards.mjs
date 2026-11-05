@@ -61,70 +61,6 @@ function asciiVisual(t, box) {
   return { svg: s, style: MONO + part.css };
 }
 
-// ---------------------------------------------------------------- agent office
-function officeVisual(t, box) {
-  const u = 4;
-  const ox = box.x, oy = box.y;
-  const px = (x, y, w, h, fill, extra = "") => `<rect x="${ox + x * u}" y="${oy + y * u}" width="${w * u}" height="${h * u}" fill="${fill}"${extra}/>`;
-  const cols = Math.floor(box.w / u), rows = Math.floor(box.h / u);
-  const wall = t.dark ? "#111a2a" : "#eef3fe";
-  const floor = t.dark ? "#0b111b" : "#f6f8fd";
-  const trim = t.dark ? "#22406e" : "#c9d8fb";
-  const desk = t.dark ? "#3b4252" : "#c7cbd3";
-  const deskDark = t.dark ? "#2a303c" : "#a9aeb8";
-  const skin = "#f1c7a2";
-  const hair = t.dark ? "#d7dde6" : "#2b2f36";
-  let s = "";
-  s += px(0, 0, cols, 38, wall) + px(0, 38, cols, rows - 38, floor) + px(0, 38, cols, 1, trim);
-  // window on the back wall, a sky with one cloud
-  s += px(74, 6, 30, 16, trim) + px(75, 7, 28, 14, t.dark ? "#16294a" : "#dbe7ff") + px(80, 11, 6, 2, t.card) + px(78, 12, 10, 2, t.card);
-  // the lift
-  s += px(4, 8, 18, 30, trim) + px(5, 10, 16, 28, t.dark ? "#1b2638" : "#dfe6f3");
-  s += `<g class="door-l">${px(5, 10, 8, 28, t.dark ? "#2c3b55" : "#c3cfe4")}</g><g class="door-r">${px(13, 10, 8, 28, t.dark ? "#2c3b55" : "#c3cfe4")}</g>`;
-  s += px(11, 5, 4, 2, t.blue);
-
-  const agents = [
-    { name: "claude", color: "#d97757", x: 30 },
-    { name: "codex", color: t.dark ? "#e6edf3" : "#1f2328", x: 60 },
-    { name: "command", color: t.blue, x: 90 },
-  ];
-  for (const [i, a] of agents.entries()) {
-    const x = a.x, y = 44;
-    // chair back, then the worker, then the desk in front
-    s += px(x + 2, y - 9, 9, 10, t.dark ? "#262c36" : "#dcdfe5");
-    s += px(x + 3, y - 15, 6, 6, skin) + px(x + 3, y - 15, 6, 2, hair) + px(x + 7, y - 13, 1, 1, "#1f2328");
-    s += px(x + 2, y - 9, 8, 8, a.color);
-    s += px(x - 2, y - 1, 30, 2, desk) + px(x - 1, y + 1, 1, 8, deskDark) + px(x + 26, y + 1, 1, 8, deskDark);
-    // monitor and its screen
-    s += px(x + 13, y - 12, 13, 10, t.dark ? "#3b4252" : "#2b2f36") + px(x + 14, y - 11, 11, 8, "#0d1117") + px(x + 19, y - 2, 1, 1, deskDark);
-    const lineColors = [a.color, "#7ee787", "#8b949e"];
-    for (let k = 0; k < 3; k++) {
-      const w = [7, 9, 5][(k + i) % 3];
-      s += `<rect class="type type${k}" style="animation-delay:${(i * 0.7 + k * 0.35).toFixed(2)}s" x="${ox + (x + 15) * u}" y="${oy + (y - 10 + k * 2) * u + 1}" width="${w * u}" height="${u - 1}" fill="${lineColors[k]}"/>`;
-    }
-    s += text(a.name, { x: ox + (x + 12) * u, y: oy + (y + 15) * u, font: "mono", size: 13, fill: t.ink3, anchor: "middle" }).svg;
-  }
-  // claude is thinking
-  const tx = ox + (30 + 6) * u, ty = oy + 44 * u - 19 * u;
-  s += `<g class="think">${[0, 1, 2].map((k) => `<circle class="dot dot${k}" cx="${tx + k * 9}" cy="${ty - k * 5}" r="${2 + k}" fill="${t.ink3}"/>`).join("")}</g>`;
-  // codex has its hand up: it is waiting on you
-  const hx = ox + (60 + 5) * u, hy = oy + (44 - 24) * u;
-  s += `<g class="bob"><rect x="${hx}" y="${hy}" width="${5 * u}" height="${6 * u}" rx="3" fill="#f2b33d"/>${text("!", { x: hx + 2.5 * u, y: hy + 4.9 * u, font: "semibold", size: 17, fill: "#1f2328", anchor: "middle" }).svg}</g>`;
-  s += px(60 + 10, 44 - 13, 2, 5, skin, ` class="bob"`);
-  // an intern walks out of the lift
-  const ix = 9, iy = 44 + 6;
-  s += `<g class="intern">${px(ix + 1, iy - 12, 4, 4, skin)}${px(ix + 1, iy - 12, 4, 1, hair)}${px(ix, iy - 8, 6, 6, "#8e75ff")}${px(ix + 1, iy - 2, 1, 3, hair)}${px(ix + 4, iy - 2, 1, 3, hair)}</g>`;
-
-  const style =
-    `.type{transform-box:fill-box;transform-origin:left;animation:type 2.4s steps(6) infinite}` +
-    `@keyframes type{0%{transform:scaleX(0)}60%,100%{transform:scaleX(1)}}` +
-    `.dot{animation:fade 2.4s ease-in-out infinite}.dot1{animation-delay:.3s}.dot2{animation-delay:.6s}@keyframes fade{0%,100%{opacity:.15}50%{opacity:1}}` +
-    `.bob{animation:bob 1.2s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-4px)}}` +
-    `.intern{animation:walk 9s linear infinite}@keyframes walk{0%,8%{transform:translateX(0);opacity:0}12%{opacity:1}55%{transform:translateX(${16 * u}px)}75%{transform:translateX(${16 * u}px);opacity:1}82%,100%{transform:translateX(${16 * u}px);opacity:0}}` +
-    `.door-l,.door-r{transform-box:fill-box;animation:door 9s ease-in-out infinite}.door-l{transform-origin:left}.door-r{transform-origin:right}@keyframes door{0%,2%{transform:scaleX(1)}8%,16%{transform:scaleX(.15)}22%,100%{transform:scaleX(1)}}`;
-  return { svg: s, style };
-}
-
 // ---------------------------------------------------------------- airsec
 function airsecVisual(t, box) {
   let s = "";
@@ -274,68 +210,38 @@ function tplayVisual(t, box) {
   return { svg: s, style };
 }
 
-// ---------------------------------------------------------------- lineup
-function lineupVisual(t, box) {
-  let s = "";
-  const sw = 300, sh = 176;
-  const sx = box.x + (box.w - sw) / 2, sy = box.y + 26;
-  const widths = [170, 220, 150, 200, 170, 190];
-  const gap = 10, wy = sy + 24, wh = sh - 36;
-  let row = "";
-  let x = sx + 10 - 0;
-  for (const [i, w] of widths.entries()) {
-    const focus = i === 2;
-    row += `<rect x="${x}" y="${wy}" width="${w}" height="${wh}" rx="7" fill="${t.card}" stroke="${focus ? t.blue : t.line}" stroke-width="${focus ? 2 : 1}"/>`;
-    row += `<rect x="${x}" y="${wy}" width="${w}" height="16" rx="7" fill="${focus ? t.blueSoft : t.tint}"/><rect x="${x}" y="${wy + 9}" width="${w}" height="7" fill="${focus ? t.blueSoft : t.tint}"/>`;
-    for (let k = 0; k < 3; k++) row += `<circle cx="${x + 9 + k * 8}" cy="${wy + 8}" r="2.3" fill="${t.line}"/>`;
-    for (let k = 0; k < 5; k++) {
-      const lw = (w - 24) * [0.85, 0.6, 0.75, 0.4, 0.65][(k + i) % 5];
-      row += `<rect x="${x + 12}" y="${wy + 28 + k * 18}" width="${lw}" height="7" rx="3.5" fill="${focus ? t.blueLine : t.line}"/>`;
-    }
-    x += w + gap;
-  }
-  // the row is wider than the screen: show it faint outside, whole inside
-  s += `<defs><clipPath id="screen"><rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" rx="12"/></clipPath><clipPath id="outside"><rect x="${box.x}" y="${box.y}" width="${box.w}" height="${box.h}"/></clipPath></defs>`;
-  s += `<g clip-path="url(#outside)"><g class="row" opacity=".28">${row}</g></g>`;
-  s += `<rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" rx="12" fill="${t.bg}"/>`;
-  s += `<g clip-path="url(#screen)"><g class="row">${row}</g><rect x="${sx}" y="${sy}" width="${sw}" height="16" fill="${t.dark ? "#161b22" : "#f0f1f4"}"/></g>`;
-  s += `<rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" rx="12" fill="none" stroke="${t.ink3}" stroke-width="1.5"/>`;
-  s += `<circle cx="${sx + 12}" cy="${sy + 8}" r="2.5" fill="${t.ink3}"/>`;
-  s += text("ctrl + option + scroll", { x: box.x + box.w / 2, y: sy + sh + 28, font: "mono", size: 13, fill: t.ink3, anchor: "middle" }).svg;
-  // slide along the row: rest, glide, rest
-  const stop = (i) => -(widths.slice(0, i).reduce((a, b) => a + b + gap, 0)) + (sw - widths[i]) / 2 - 10;
-  const p = [stop(1), stop(2), stop(3), stop(2)];
-  const style =
-    `.row{transform:translateX(${p[0]}px);animation:slide 12s cubic-bezier(.65,0,.35,1) infinite}` +
-    `@keyframes slide{0%,18%{transform:translateX(${p[0]}px)}25%,43%{transform:translateX(${p[1]}px)}50%,68%{transform:translateX(${p[2]}px)}75%,93%{transform:translateX(${p[3]}px)}100%{transform:translateX(${p[0]}px)}}`;
-  return { svg: s, style };
+// ---------------------------------------------------------------- stars
+// ascii's star count from GitHub at build time, rounded down so the chip
+// stays true as it grows: 1,135 is "1.1k"
+async function stars(repo) {
+  const res = await fetch(`https://api.github.com/repos/${repo}`, { headers: { "user-agent": "bas3line-readme" } });
+  if (!res.ok) throw new Error(`GitHub said ${res.status} for ${repo}'s star count`);
+  const n = (await res.json()).stargazers_count;
+  return n >= 1000 ? `${Math.floor(n / 100) / 10}k` : String(n);
 }
 
+// the slot a recorded clip fills in a card: the panel's inner edge, 1px in
+export const SLOT = { x: 43, y: 225, w: W - 86, h: H - 268, r: 7 };
+const empty = () => ({ svg: "" });
+
+const TS = { text: "TypeScript", logo: "typescript" };
+
 export const CARDS = {
-  "card-ascii": (t) =>
+  "card-ascii": async (t) =>
     card(t, {
       n: "01",
       title: "ascii",
       desc: "Animated ascii art for web pages, in TypeScript: React, Next.js, Astro, or one HTML tag.",
-      tags: ["TypeScript", "240 pieces", "ascii.rest"],
+      tags: [TS, { text: `${await stars("bas3line/ascii")} stars`, star: true }, "240 pieces", "ascii.rest"],
       label: "ascii: animated ascii art for web pages, with a spinning ascii donut",
       visual: asciiVisual,
-    }),
-  "card-agent-office": (t) =>
-    card(t, {
-      n: "02",
-      title: "agent office",
-      desc: "Your coding agents working in a live pixel-art office: Claude Code, Codex, Command Code and five more.",
-      tags: ["TypeScript", "local or sandboxed", "npx theagentoffice"],
-      label: "agent office: coding agents as pixel-art workers at desks",
-      visual: officeVisual,
     }),
   "card-airsec": (t) =>
     card(t, {
       n: "03",
       title: "airsec",
       desc: "Security review driven by the coding CLI you already have. No new API key, no cloud upload.",
-      tags: ["TypeScript", "Node 20+", "npx airsec"],
+      tags: [TS, { text: "Node 20+", logo: "nodejs" }, "npx airsec"],
       label: "airsec: security review driven by your coding CLI",
       visual: airsecVisual,
     }),
@@ -344,7 +250,7 @@ export const CARDS = {
       n: "04",
       title: "Gopher",
       desc: "An AI Discord bot with long-term memory, web research, vision and voice replies.",
-      tags: ["TypeScript", "Bun", "pgvector"],
+      tags: [TS, { text: "Bun", logo: "bun" }, { text: "pgvector", logo: "postgresql" }],
       label: "Gopher: an AI Discord bot that remembers",
       visual: gopherVisual,
     }),
@@ -353,17 +259,37 @@ export const CARDS = {
       n: "05",
       title: "tplay",
       desc: "Play videos in your terminal, with sound: half-block colour, dithered braille dots, or ascii.",
-      tags: ["Rust", "ffmpeg", "3 picture modes"],
+      tags: [{ text: "Rust", logo: "rust" }, { text: "ffmpeg", logo: "ffmpeg" }, "3 picture modes"],
       label: "tplay: video in the terminal, drawn in braille dots",
       visual: tplayVisual,
     }),
-  "card-lineup": (t) =>
-    card(t, {
-      n: "06",
-      title: "Lineup",
-      desc: "A calm, scrolling window manager for macOS. Your windows stay side by side in one tidy row.",
-      tags: ["Swift", "macOS 13+", "MIT"],
-      label: "Lineup: a scrolling window manager for macOS",
-      visual: lineupVisual,
-    }),
+};
+
+// cards whose panel holds a recorded clip: media.mjs draws these frames and
+// films the clip into SLOT
+export const CLIP_CARDS = {
+  "card-agent-office": {
+    frame: (t) =>
+      card(t, {
+        n: "02",
+        title: "agent office",
+        desc: "Your coding agents working in a live pixel-art office: Claude Code, Codex, Command Code and five more.",
+        tags: [TS, "local or sandboxed", "npx theagentoffice"],
+        label: "agent office: coding agents as pixel-art workers at desks",
+        visual: empty,
+      }),
+    alt: "agent office: Claude Code flips a table in the pixel office when a test fails",
+  },
+  "card-components": {
+    frame: (t) =>
+      card(t, {
+        n: "06",
+        title: "Components",
+        desc: "React components drawn in code: isometric servers, racks, terminals and maps. Copy a folder and make it yours.",
+        tags: [{ text: "React", logo: "react" }, { text: "Tailwind", logo: "tailwind" }, "10 components"],
+        label: "Components: React components drawn in code",
+        visual: empty,
+      }),
+    alt: "Components: a server on an island of its own, drawn in SVG and CSS",
+  },
 };
