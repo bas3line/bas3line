@@ -1,7 +1,7 @@
 // Everything full-width or small that isn't the hero or a project card:
 // section headings, the timeline, the work wall, page frames and buttons.
 import { readFileSync } from "node:fs";
-import { doc, measure, paragraph, text } from "./lib.mjs";
+import { doc, image, logo, measure, paragraph, text } from "./lib.mjs";
 
 const W = 1280;
 
@@ -115,37 +115,47 @@ export function work(t, { chipsDir }) {
     ["groot", "Groot Music", "software engineer"],
     [null, "MemePay", "cto"],
   ];
-  const H = 330, top = 62, cw = (W - 80) / 3, ch = (H - top) / 2;
+  const H = 372, top = 70, cw = (W - 80) / 3, ch = (H - top) / 2;
   let b = `<path d="M0 0.5H${W}M0 ${top}H${W}M0 ${top + ch}H${W}M0 ${H - 0.5}H${W}M40 ${top}V${H}M${40 + cw} ${top}V${H}M${40 + cw * 2} ${top}V${H}M${W - 40} ${top}V${H}" stroke="${t.line}"/>`;
   for (const x of [40, 40 + cw, 40 + cw * 2, W - 40]) for (const y of [top, top + ch, H - 0.5]) b += `<circle cx="${x}" cy="${y}" r="3" fill="${t.bg}" stroke="${t.line}"/>`;
-  const a = "Production I've shipped, and ";
-  const c = "kept boring.";
-  const tw = measure(a, { size: 17 }) + measure(c, { size: 17 });
-  const ta = text(a, { x: (W - tw) / 2, y: 37, size: 17, fill: t.ink2 });
-  b += ta.svg + text(c, { x: (W - tw) / 2 + ta.width, y: 37, size: 17, fill: t.blue }).svg;
+  const a = "Where I've built, shipped and ";
+  const c = "run production.";
+  const tw = measure(a, { size: 21 }) + measure(c, { size: 21 });
+  const ta = text(a, { x: (W - tw) / 2, y: 43, size: 21, fill: t.ink2 });
+  b += ta.svg + text(c, { x: (W - tw) / 2 + ta.width, y: 43, size: 21, fill: t.blue }).svg;
   teams.forEach(([logo, name, role], i) => {
     const cx = 40 + cw * (i % 3) + cw / 2;
     const cy = top + ch * Math.floor(i / 3) + ch / 2;
-    const nw = measure(name, { font: "medium", size: 24, tracking: -0.02 });
-    const lw = 30, gap = 12;
-    const sx = cx - (lw + gap + nw) / 2;
+    const nw = measure(name, { font: "medium", size: 30, tracking: -0.02 });
+    const lw = 38, gap = 14;
+    const sx = cx - (lw + gap + nw) / 2, sy = cy - 40;
+    b += `<clipPath id="l${i}"><rect x="${sx}" y="${sy}" width="${lw}" height="${lw}" rx="8"/></clipPath>`;
     if (logo) {
-      const data = readFileSync(`${chipsDir}/${logo}.svg`).toString("base64");
-      b += `<image x="${sx}" y="${cy - 30}" width="${lw}" height="${lw}" href="data:image/svg+xml;base64,${data}"/>`;
+      // the chip's own raster, drawn straight in rather than as a nested SVG
+      const src = readFileSync(`${chipsDir}/${logo}.svg`, "utf8");
+      const bg = src.match(/<rect width="32" height="32" fill="(#[0-9a-fA-F]{6})"/)?.[1] ?? t.card;
+      const img = src.match(/<image x="([-\d.]+)" y="([-\d.]+)" width="([\d.]+)" height="([\d.]+)"[^>]*?href="(data:[^"]+)"/);
+      const k = lw / 32;
+      b += `<g clip-path="url(#l${i})"><rect x="${sx}" y="${sy}" width="${lw}" height="${lw}" fill="${bg}"/>`;
+      b += `<image x="${sx + img[1] * k}" y="${sy + img[2] * k}" width="${img[3] * k}" height="${img[4] * k}" preserveAspectRatio="xMidYMid meet" href="${img[5]}"/></g>`;
     } else {
-      b += `<rect x="${sx}" y="${cy - 30}" width="${lw}" height="${lw}" rx="6" fill="${t.ink}"/>` + text("M", { x: sx + lw / 2, y: cy - 9, font: "semibold", size: 16, fill: t.bg, anchor: "middle" }).svg;
+      b += `<rect x="${sx}" y="${sy}" width="${lw}" height="${lw}" rx="8" fill="${t.ink}"/>` + text("M", { x: sx + lw / 2, y: sy + 26, font: "semibold", size: 20, fill: t.bg, anchor: "middle" }).svg;
     }
-    b += text(name, { x: sx + lw + gap, y: cy - 6, font: "medium", size: 24, tracking: -0.02, fill: t.ink }).svg;
-    b += text(role, { x: cx, y: cy + 26, font: "mono", size: 14, fill: t.ink3, anchor: "middle" }).svg;
+    b += text(name, { x: sx + lw + gap, y: cy - 10, font: "medium", size: 30, tracking: -0.02, fill: t.ink }).svg;
+    b += text(role, { x: cx, y: cy + 34, font: "mono", size: 18, fill: t.ink2, anchor: "middle" }).svg;
   });
   return doc({ w: W, h: H, t, label: `Work: ${teams.map((x) => `${x[1]}, ${x[2]}`).join("; ")}`, body: b });
 }
 
 // ---------------------------------------------------------------- page frames
+// where the page itself sits in its frame: media.mjs films the live site into
+// it, at 1440 by 900 scaled down
+export const PAGE_SLOT = { x: 19, y: 53, w: 562, h: Math.round((562 * 900) / 1440), r: 8 };
+
+// a browser frame; with no file, the screen is left for media.mjs to fill
 export function page(t, { file, url, name, line }) {
-  const PW = 600, iw = PW - 38, ih = Math.round((iw * 900) / 1440);
+  const PW = 600, iw = PAGE_SLOT.w, ih = PAGE_SLOT.h;
   const PH = 7 + 46 + ih + 86 + 7;
-  const data = readFileSync(file).toString("base64");
   let b =
     `<rect x="0.5" y="0.5" width="${PW - 1}" height="${PH - 1}" rx="22" fill="${t.tint}" stroke="${t.blueLine}"/>` +
     `<rect x="7" y="7" width="${PW - 14}" height="${PH - 14}" rx="17" fill="${t.card}" stroke="${t.blueLine}"/>`;
@@ -153,9 +163,12 @@ export function page(t, { file, url, name, line }) {
   const uw = measure(url, { font: "mono", size: 12.5 }) + 28;
   b += `<rect x="${(PW - uw) / 2}" y="17" width="${uw}" height="26" rx="13" fill="${t.tint}" stroke="${t.line}"/>`;
   b += text(url, { x: PW / 2, y: 34.5, font: "mono", size: 12.5, fill: t.ink3, anchor: "middle" }).svg;
-  const ix = 19, iy = 53;
-  b += `<defs><clipPath id="shot"><rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="8"/></clipPath></defs>`;
-  b += `<image x="${ix}" y="${iy}" width="${iw}" height="${ih}" preserveAspectRatio="xMidYMin slice" clip-path="url(#shot)" href="data:image/jpeg;base64,${data}"/>`;
+  const ix = PAGE_SLOT.x, iy = PAGE_SLOT.y;
+  if (file) {
+    const data = readFileSync(file).toString("base64");
+    b += `<defs><clipPath id="shot"><rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="8"/></clipPath></defs>`;
+    b += `<image x="${ix}" y="${iy}" width="${iw}" height="${ih}" preserveAspectRatio="xMidYMin slice" clip-path="url(#shot)" href="data:image/jpeg;base64,${data}"/>`;
+  }
   b += `<rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="8" fill="none" stroke="${t.line}"/>`;
   b += text(name, { x: 30, y: iy + ih + 38, font: "medium", size: 22, tracking: -0.02, fill: t.ink }).svg;
   b += text(line, { x: 30, y: iy + ih + 64, font: "mono", size: 13, fill: t.ink3 }).svg;
@@ -163,18 +176,29 @@ export function page(t, { file, url, name, line }) {
 }
 
 // ---------------------------------------------------------------- buttons
-export function button(t, { label, kind = "outline", arrow = false }) {
-  const size = 17, h = 52, pad = 24;
-  const lw = measure(label, { font: "medium", size });
-  const w = Math.ceil(lw + pad * 2 + (arrow ? 24 : 0)) + 4;
-  const fill = kind === "solid" ? t.pill : kind === "blue" ? t.bg : t.bg;
+// a pill button: an icon from assets/icons or assets/chips, then the label;
+// with no label it is a round icon button
+export function button(t, { label, icon, round = 18, kind = "outline", arrow = false, alt }) {
+  const size = 17, h = 52, pad = label ? 22 : 0;
+  const fill = kind === "solid" ? t.pill : t.bg;
   const stroke = kind === "solid" ? t.pill : kind === "blue" ? t.blue : t.line;
   const ink = kind === "solid" ? t.pillInk : kind === "blue" ? t.blue : t.ink;
+  const href = icon ? logo(icon, kind === "solid" ? { ...t, dark: !t.dark } : t, { recolor: kind === "blue" ? t.blue : undefined }) : null;
+  const is = icon === "yshubham" ? 22 : round;
+  const lw = label ? measure(label, { font: "medium", size }) : 0;
+  const w = label ? Math.ceil(pad + (href ? is + 10 : 0) + lw + pad + (arrow ? 24 : 0)) + 4 : h;
   let b = `<rect x="2" y="2" width="${w - 4}" height="${h - 4}" rx="${(h - 4) / 2}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>`;
-  b += text(label, { x: 2 + pad, y: h / 2 + 6, font: "medium", size, fill: ink }).svg;
+  let x = 2 + pad;
+  if (href) {
+    if (icon === "yshubham") b += `<clipPath id="ic"><rect x="${label ? x : (w - is) / 2}" y="${(h - is) / 2}" width="${is}" height="${is}" rx="6"/></clipPath><g clip-path="url(#ic)">`;
+    b += image(href, label ? x : (w - is) / 2, (h - is) / 2, is);
+    if (icon === "yshubham") b += `</g>`;
+    x += is + 10;
+  }
+  if (label) b += text(label, { x, y: h / 2 + 6, font: "medium", size, fill: ink }).svg;
   if (arrow) {
-    const ax = 2 + pad + lw + 12, ay = h / 2;
+    const ax = x + lw + 12, ay = h / 2;
     b += `<path d="M${ax} ${ay}H${ax + 13}M${ax + 7.5} ${ay - 5.5}L${ax + 13} ${ay}L${ax + 7.5} ${ay + 5.5}" stroke="${ink}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
   }
-  return doc({ w, h, t, label, body: b, bg: false });
+  return doc({ w, h, t, label: alt ?? label, body: b, bg: false });
 }

@@ -1,14 +1,17 @@
 {
   "name": "bas3line-readme",
   "private": true,
-  "description": "Draws the profile README's images: npm install && npm run build",
+  "description": "Draws the profile README's images: npm install && npm run build && npm run media",
   "scripts": {
-    "build": "node build.mjs"
+    "build": "node build.mjs",
+    "media": "node media.mjs",
+    "fetch-demo": "curl -fsSL -o sources/agent-office-demo.mp4 https://raw.githubusercontent.com/bas3line/agent-office/main/docs/demo.mp4"
   },
   "dependencies": {
     "ascii.rest": "0.4.0",
     "geist": "1.9.1",
     "jpeg-js": "0.4.4",
-    "opentype.js": "2.0.0"
+    "opentype.js": "2.0.0",
+    "simple-icons": "16.36.0"
   }
 }
