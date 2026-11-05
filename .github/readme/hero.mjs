@@ -100,11 +100,12 @@ export async function hero(t) {
 
   const height = Math.max(H, capY + 76);
 
-  // page frame: two verticals and a rule along the bottom, with turtle's dots at the joins
-  const fx0 = 40, fx1 = W - 40, fy = height - 30;
+  // page frame: two verticals and a rule along the top and bottom, with turtle's dots at the joins
+  const fx0 = 40, fx1 = W - 40, fy0 = 30, fy1 = height - 30;
+  const dot = (cx, cy) => `<circle cx="${cx}" cy="${cy}" r="3" fill="${t.bg}" stroke="${t.line}"/>`;
   const frame =
-    `<path d="M${fx0} 0V${height}M${fx1} 0V${height}M0 ${fy}H${W}" stroke="${t.line}"/>` +
-    `<circle cx="${fx0}" cy="${fy}" r="3" fill="${t.bg}" stroke="${t.line}"/><circle cx="${fx1}" cy="${fy}" r="3" fill="${t.bg}" stroke="${t.line}"/>`;
+    `<path d="M${fx0} 0V${height}M${fx1} 0V${height}M0 ${fy0}H${W}M0 ${fy1}H${W}" stroke="${t.line}"/>` +
+    dot(fx0, fy0) + dot(fx1, fy0) + dot(fx0, fy1) + dot(fx1, fy1);
 
   return doc({
     w: W,
