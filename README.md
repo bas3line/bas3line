@@ -1,130 +1,76 @@
-<h1 align="center">hey, i'm shubham</h1>
+<a href="https://yshubham.com">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/readme/hero-dark.svg">
+    <img alt="Boring servers. Pretty pages. I'm Shubham, a systems engineer from Jaipur: I keep inference running at Command Code, and on the side I make tools for coding agents, terminals and the web. Beside it, Sahib Ram's Head of Krishna redrawn in ascii." src="assets/readme/hero.svg" width="100%">
+  </picture>
+</a>
 
 <p align="center">
-  systems &amp; backend engineer from jaipur, india — i also go by <b>kira</b>.<br>
-  i build inference infrastructure, low-level tools, and production paths that stay understandable under load.
+  <a href="https://yshubham.com"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/btn-site-dark.svg"><img alt="yshubham.com" src="assets/readme/btn-site.svg" height="40"></picture></a>
+  <a href="https://cal.com/shubhamyadav"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/btn-call-dark.svg"><img alt="Book a call" src="assets/readme/btn-call.svg" height="40"></picture></a>
+  <a href="mailto:hi@yshubham.com"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/btn-mail-dark.svg"><img alt="Email hi@yshubham.com" src="assets/readme/btn-mail.svg" height="40"></picture></a>
+  <a href="https://x.com/inlovewithgo"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/btn-x-dark.svg"><img alt="X" src="assets/readme/btn-x.svg" height="40"></picture></a>
+  <a href="https://www.linkedin.com/in/extractings/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/btn-linkedin-dark.svg"><img alt="LinkedIn" src="assets/readme/btn-linkedin.svg" height="40"></picture></a>
 </p>
 
-<p align="center">
-  <a href="https://github.com/bas3line" title="github"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/github-dark.svg"><img src="assets/icons/github.svg" width="22" alt="github"></picture></a>
-  &nbsp;&nbsp;
-  <a href="https://x.com/inlovewithgo" title="x"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/x-dark.svg"><img src="assets/icons/x.svg" width="22" alt="x"></picture></a>
-  &nbsp;&nbsp;
-  <a href="https://www.linkedin.com/in/extractings/" title="linkedin"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/linkedin-dark.svg"><img src="assets/icons/linkedin.svg" width="22" alt="linkedin"></picture></a>
-  &nbsp;&nbsp;
-  <a href="mailto:hi@yshubham.com" title="hi@yshubham.com"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/mail-dark.svg"><img src="assets/icons/mail.svg" width="22" alt="email"></picture></a>
-  &nbsp;&nbsp;
-  <a href="https://cal.com/shubhamyadav" title="book a call"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/calendar-dark.svg"><img src="assets/icons/calendar.svg" width="22" alt="book a call"></picture></a>
-</p>
+<br>
 
-<p align="center">
-  <a href="https://yshubham.com"><img src="assets/chips/yshubham.svg" width="14" alt=""> website</a> ·
-  <a href="https://yshubham.com/work/"><img src="assets/chips/yshubham.svg" width="14" alt=""> work</a> ·
-  <a href="https://yshubham.com/blog/"><img src="assets/chips/yshubham.svg" width="14" alt=""> writing</a> ·
-  <a href="https://yshubham.com/tools/"><img src="assets/chips/yshubham.svg" width="14" alt=""> tools</a> ·
-  <a href="https://git.yshubham.com/"><img src="assets/chips/yshubham.svg" width="14" alt=""> git</a> ·
-  <a href="https://yshubham.com/manga/"><img src="assets/chips/yshubham.svg" width="14" alt=""> shelf</a> ·
-  <a href="https://yshubham.com/shubham.json"><img src="assets/chips/yshubham.svg" width="14" alt=""> shubham.json</a>
-</p>
-
----
-
-## work
-
-<img src="assets/chips/commandcode.svg" width="14" alt=""> **[commandcode.ai](https://commandcode.ai)** · software engineer · jun 2026 — present
-
-inference devops for production systems — deployments, observability, and tui work.
-
-previously:
-
-<img src="assets/chips/routing.svg" width="14" alt=""> **[routing.run](https://routing.run)** · co-founder & cto — built an llm api gateway from scratch: multi-provider routing, fallback, auth, billing, provider health. ran it through acquisition and handover.
-
-<img src="assets/chips/megallm.svg" width="14" alt=""> **[MegaLLM](https://megallm.io)** · founding member & senior software engineer — a swift macos app with system-level integrations, a multi-tenant reseller platform, go and typescript routing backends, lora training workflows, jenkins release pipelines.
-
-<img src="assets/chips/dyntech.svg" width="14" alt=""> **[DynTech](https://enigma.ws)** · software engineer — built a copy-trading system across platforms like Sterling and MT5, plus auth, subscriptions, and the jenkins/docker deployment path.
-
-<img src="assets/chips/groot.svg" width="14" alt=""> **[Groot Music](https://grootbot.pro)** · software engineer — scaled the backend of a high-traffic discord music bot across thousands of servers.
-
-**MemePay** · cto — a solana trading product across frontend, backend, and deployment.
-
-**Meds Reminder** · backend developer — apis and data handling for medication reminders and scheduling.
-
-the full timeline lives at <img src="assets/chips/yshubham.svg" width="14" alt=""> **[yshubham.com/work](https://yshubham.com/work/)**.
-
-## projects
-
-<img src="assets/chips/routing.svg" width="14" alt=""> **[routing.run](https://routing.run)** · python · fastapi · postgresql · redis — a stable openai-compatible endpoint over a model market that changes every week · <img src="assets/chips/yshubham.svg" width="14" alt=""> [case study](https://yshubham.com/work/routing-run/)
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/github-dark.svg"><img src="assets/icons/github.svg" width="14" alt=""></picture> **[Sandbox](https://github.com/bas3line/sandbox)** · rust · postgresql · nats · docker — disposable coding environments for humans and agents, with policy enforced by the server instead of the prompt · <img src="assets/chips/yshubham.svg" width="14" alt=""> [docs](https://docs.yshubham.com/v2/products/sandbox)
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/github-dark.svg"><img src="assets/icons/github.svg" width="14" alt=""></picture> **[Watchman](https://github.com/bas3line/watchman)** · rust — an operator's lens for gpu inference servers: inspect, benchmark, and catch trouble before users do · <img src="assets/chips/yshubham.svg" width="14" alt=""> [docs](https://docs.yshubham.com/v2/products/watchman)
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/github-dark.svg"><img src="assets/icons/github.svg" width="14" alt=""></picture> **[UltraBalancer](https://github.com/bas3line/ultrabalancer)** · rust · tokio · http/2 — a small, inspectable http/2 data path built to stay fast when connection counts stop being friendly · <img src="assets/chips/yshubham.svg" width="14" alt=""> [case study](https://yshubham.com/work/ultrabalancer/)
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/github-dark.svg"><img src="assets/icons/github.svg" width="14" alt=""></picture> **[Context Bridge](https://github.com/bas3line/Context-Bridge)** · rust — moves coding-session context between opencode, claude code, and codex without pretending hidden model state is portable · <img src="assets/chips/yshubham.svg" width="14" alt=""> [docs](https://docs.yshubham.com/v2/context-bridge/overview)
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/github-dark.svg"><img src="assets/icons/github.svg" width="14" alt=""></picture> **[Honeypot](https://github.com/bas3line/honeypot)** · rust — an ssh honeypot for cybersecurity training and attack-surface observation
-
-<img src="assets/icons/saucer.svg" width="14" alt=""> **[saucer.sh](https://saucer.sh)** · file drop — put a file on the web from your terminal or your browser, at a link you control
-
-## public edge
-
-<a href="https://status.yshubham.com/"><img src="https://status.yshubham.com/badge.svg?v=1" alt="live latency for git, docs, forge, registry, trace, and objects"></a>
-
-[git](https://git.yshubham.com/) · [docs](https://docs.yshubham.com) · [status](https://status.yshubham.com) · [trace](https://trace.yshubham.com) · [objects](https://objects.yshubham.com/) · [registry](https://tools.yshubham.com)
-
-## skills
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/heading-projects-dark.svg">
+  <img alt="Things I've made. Agents. Terminals. The web." src="assets/readme/heading-projects.svg" width="100%">
+</picture>
 
 <p>
-  <img src="assets/tech/go.svg" width="24" title="Go" alt="Go">&nbsp;
-  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/tech/rust-dark.svg"><img src="assets/tech/rust.svg" width="24" title="Rust" alt="Rust"></picture>&nbsp;
-  <img src="assets/tech/python.svg" width="24" title="Python" alt="Python">&nbsp;
-  <img src="assets/tech/typescript.svg" width="24" title="TypeScript" alt="TypeScript">&nbsp;
-  <img src="assets/tech/c.svg" width="24" title="C" alt="C">&nbsp;
-  <img src="assets/tech/cplusplus.svg" width="24" title="C++" alt="C++">&nbsp;
-  <img src="assets/tech/zig.svg" width="24" title="Zig" alt="Zig">&nbsp;
-  <img src="assets/tech/swift.svg" width="24" title="Swift" alt="Swift">&nbsp;
-  <img src="assets/tech/nodejs.svg" width="24" title="Node.js" alt="Node.js">&nbsp;
-  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/tech/bun-dark.svg"><img src="assets/tech/bun.svg" width="24" title="Bun" alt="Bun"></picture>&nbsp;
-  <img src="assets/tech/astro.svg" width="24" title="Astro" alt="Astro">&nbsp;
-  <img src="assets/tech/nvidia.svg" width="24" title="NVIDIA CUDA" alt="CUDA">&nbsp;
-  <img src="assets/tech/vllm.svg" width="24" title="vLLM" alt="vLLM">&nbsp;
-  <img src="assets/tech/pytorch.svg" width="24" title="PyTorch" alt="PyTorch">&nbsp;
-  <img src="assets/tech/huggingface.svg" width="24" title="Transformers" alt="Transformers">&nbsp;
-  <img src="assets/tech/postgresql.svg" width="24" title="PostgreSQL" alt="PostgreSQL">&nbsp;
-  <img src="assets/tech/redis.svg" width="24" title="Redis" alt="Redis">&nbsp;
-  <img src="assets/tech/valkey.png" width="24" title="Valkey" alt="Valkey">&nbsp;
-  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/tech/sqlite-dark.svg"><img src="assets/tech/sqlite.svg" width="24" title="SQLite" alt="SQLite"></picture>&nbsp;
-  <img src="assets/tech/clickhouse.svg" width="24" title="ClickHouse" alt="ClickHouse">&nbsp;
-  <img src="assets/tech/scylladb.svg" width="24" title="ScyllaDB" alt="ScyllaDB">&nbsp;
-  <img src="assets/tech/nats.svg" width="24" title="NATS" alt="NATS">&nbsp;
-  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/tech/kafka-dark.svg"><img src="assets/tech/kafka.svg" width="24" title="Apache Kafka" alt="Kafka"></picture>&nbsp;
-  <img src="assets/tech/rabbitmq.svg" width="24" title="RabbitMQ" alt="RabbitMQ">&nbsp;
-  <img src="assets/tech/docker.svg" width="24" title="Docker" alt="Docker">&nbsp;
-  <img src="assets/tech/kubernetes.svg" width="24" title="Kubernetes" alt="Kubernetes">&nbsp;
-  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/tech/helm-dark.svg"><img src="assets/tech/helm.svg" width="24" title="Helm" alt="Helm"></picture>&nbsp;
-  <img src="assets/tech/argo.svg" width="24" title="Argo CD" alt="Argo CD">&nbsp;
-  <img src="assets/tech/istio.svg" width="24" title="Istio" alt="Istio">&nbsp;
-  <img src="assets/tech/jenkins.svg" width="24" title="Jenkins" alt="Jenkins">&nbsp;
-  <img src="assets/tech/github-actions.svg" width="24" title="GitHub Actions" alt="GitHub Actions">&nbsp;
-  <img src="assets/tech/gitlab.svg" width="24" title="GitLab CI/CD" alt="GitLab CI/CD">&nbsp;
-  <img src="assets/tech/ansible.svg" width="24" title="Ansible" alt="Ansible">&nbsp;
-  <img src="assets/tech/terraform.svg" width="24" title="Terraform" alt="Terraform">&nbsp;
-  <img src="assets/tech/vault.svg" width="24" title="HashiCorp Vault" alt="Vault">&nbsp;
-  <img src="assets/tech/nginx.svg" width="24" title="Nginx" alt="Nginx">&nbsp;
-  <img src="assets/tech/traefik.svg" width="24" title="Traefik" alt="Traefik">&nbsp;
-  <img src="assets/tech/caddy.svg" width="24" title="Caddy" alt="Caddy">&nbsp;
-  <img src="assets/tech/grafana.svg" width="24" title="Grafana" alt="Grafana">&nbsp;
-  <img src="assets/tech/prometheus.svg" width="24" title="Prometheus" alt="Prometheus">&nbsp;
-  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/tech/opentelemetry-dark.svg"><img src="assets/tech/opentelemetry.svg" width="24" title="OpenTelemetry" alt="OpenTelemetry"></picture>&nbsp;
-  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/tech/sentry-dark.svg"><img src="assets/tech/sentry.svg" width="24" title="Sentry" alt="Sentry"></picture>&nbsp;
-  <img src="assets/tech/aws.svg" width="24" title="AWS" alt="AWS">&nbsp;
-  <img src="assets/tech/cloudflare.svg" width="24" title="Cloudflare" alt="Cloudflare">&nbsp;
-  <picture><source media="(prefers-color-scheme: dark)" srcset="assets/tech/linux-dark.svg"><img src="assets/tech/linux.svg" width="24" title="Linux" alt="Linux"></picture>&nbsp;
-  <img src="assets/tech/git.svg" width="24" title="Git" alt="Git">&nbsp;
-  <img src="assets/tech/neovim.svg" width="24" title="Neovim" alt="Neovim">
+  <a href="https://github.com/bas3line/ascii"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/card-ascii-dark.svg"><img alt="ascii: animated ascii art for web pages, in TypeScript" src="assets/readme/card-ascii.svg" width="49%"></picture></a>
+  <a href="https://github.com/bas3line/agent-office"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/card-agent-office-dark.svg"><img alt="agent office: your coding agents working in a live pixel-art office" src="assets/readme/card-agent-office.svg" width="49%"></picture></a>
+  <a href="https://github.com/bas3line/Airsec"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/card-airsec-dark.svg"><img alt="airsec: security review driven by the coding CLI you already have" src="assets/readme/card-airsec.svg" width="49%"></picture></a>
+  <a href="https://github.com/bas3line/Gopher"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/card-gopher-dark.svg"><img alt="Gopher: an AI Discord bot with long-term memory, web research, vision and voice" src="assets/readme/card-gopher.svg" width="49%"></picture></a>
+  <a href="https://github.com/bas3line/tplay"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/card-tplay-dark.svg"><img alt="tplay: play videos in your terminal, with sound" src="assets/readme/card-tplay.svg" width="49%"></picture></a>
+  <a href="https://github.com/bas3line/lineup"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/card-lineup-dark.svg"><img alt="Lineup: a calm, scrolling window manager for macOS" src="assets/readme/card-lineup.svg" width="49%"></picture></a>
 </p>
 
 <p align="center">
-  <sub>icons from <a href="https://yshubham.com">yshubham.com</a> · <a href="mailto:hi@yshubham.com">hi@yshubham.com</a></sub>
+  and <a href="https://github.com/bas3line/amv">amv</a> · <a href="https://github.com/bas3line/Components">components</a> · <a href="https://github.com/bas3line/pi-boat">pi-boat</a> · <a href="https://github.com/bas3line/penna">penna</a> · <a href="https://github.com/bas3line/s3lean">s3lean</a> · <a href="https://github.com/bas3line/webhook-relay">webhook-relay</a> · <a href="https://github.com/bas3line/sandbox">sandbox</a> · <a href="https://github.com/bas3line/watchman">watchman</a> · <a href="https://github.com/bas3line/ultrabalancer">ultrabalancer</a> · <a href="https://github.com/bas3line/Context-Bridge">context bridge</a> · <a href="https://saucer.sh">saucer.sh</a>
+</p>
+
+<br>
+
+<a href="https://github.com/bas3line?tab=repositories">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/readme/timeline-dark.svg">
+    <img alt="What I shipped in public since July, as one line: watchman, sandbox, context bridge, gopher, airsec, tplay, penna and s3lean, ascii, amv, lineup, agent office, nodeny, turtle, pi-boat, components." src="assets/readme/timeline.svg" width="100%">
+  </picture>
+</a>
+
+<br>
+<br>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/heading-pages-dark.svg">
+  <img alt="Pages I've drawn. Landing pages, drawn in code." src="assets/readme/heading-pages.svg" width="100%">
+</picture>
+
+<p>
+  <a href="https://nodeny.kiraa-7e4.workers.dev"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/page-nodeny-dark.svg"><img alt="nodeny's landing page" src="assets/readme/page-nodeny.svg" width="49%"></picture></a>
+  <a href="https://turtle.kiraa-7e4.workers.dev"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/page-turtle-dark.svg"><img alt="turtle's landing page" src="assets/readme/page-turtle.svg" width="49%"></picture></a>
+  <a href="https://absolute.kiraa-7e4.workers.dev"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/page-absolute-dark.svg"><img alt="absolute's landing page" src="assets/readme/page-absolute.svg" width="49%"></picture></a>
+  <a href="https://ascii.rest"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/page-ascii-dark.svg"><img alt="ascii.rest" src="assets/readme/page-ascii.svg" width="49%"></picture></a>
+</p>
+
+<br>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/readme/heading-work-dark.svg">
+  <img alt="Work. I keep production boring." src="assets/readme/heading-work.svg" width="100%">
+</picture>
+
+<a href="https://yshubham.com/work/">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/readme/work-dark.svg">
+    <img alt="Command Code, software engineer, now. routing.run, co-founder and CTO, acquired. MegaLLM, founding member. DynTech, software engineer. Groot Music, software engineer. MemePay, CTO." src="assets/readme/work.svg" width="100%">
+  </picture>
+</a>
+
+<p align="center">
+  <sub><i>Head of Krishna</i> by Sahib Ram, Jaipur, ca. 1800, <a href="https://www.metmuseum.org/art/collection/search/37877">The Met</a>, CC0. Set in Geist. The images are drawn by <a href=".github/readme">.github/readme</a>.</sub>
 </p>
