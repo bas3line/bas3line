@@ -1,0 +1,14 @@
+{
+  "name": "bas3line-readme",
+  "private": true,
+  "description": "Draws the profile README's images: npm install && npm run build",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "ascii.rest": "0.4.0",
+    "geist": "1.9.1",
+    "jpeg-js": "0.4.4",
+    "opentype.js": "2.0.0"
+  }
+}
