@@ -37,7 +37,7 @@ const CLIPS = {
     ...CLIP_CARDS["card-components"],
     size: [600, 520],
     slot: SLOT,
-    live: { url: "https://bas3line.github.io/Components/preview/server-island/", w: 1200, h: Math.round((1200 * SLOT.h) / SLOT.w), seconds: 5, fps: 10, settle: 4000 },
+    live: { url: "https://bas3line.github.io/Components/preview/server-island/", w: 1200, h: Math.round((1200 * SLOT.h) / SLOT.w), seconds: 6, fps: 10, settle: 400 },
   },
   ...Object.fromEntries(
     [
@@ -52,8 +52,14 @@ const CLIPS = {
         alt: `${name}'s landing page, live`,
         size: [600, 7 + 46 + PAGE_SLOT.h + 86 + 7],
         slot: PAGE_SLOT,
-        // ascii.rest redraws its whole scene every frame, so it gets fewer, lighter ones
-        live: key === "ascii" ? { url, w: 1440, h: 900, seconds: 4, fps: 8, settle: 5000, q: 55 } : { url, w: 1440, h: 900, seconds: 5, fps: 10, settle: 5000 },
+        // filmed from first paint, so each page's entrance is in the loop: nodeny
+        // shows a splash for about 2.5s first; ascii.rest redraws its whole
+        // scene every frame, so it gets fewer, lighter ones
+        live: {
+          nodeny: { url, w: 1440, h: 900, seconds: 3.2, fps: 10, settle: 2600 },
+          absolute: { url, w: 1440, h: 900, seconds: 4, fps: 10, settle: 400 },
+          ascii: { url, w: 1440, h: 900, seconds: 4, fps: 8, settle: 1500, q: 55 },
+        }[key] ?? { url, w: 1440, h: 900, seconds: 6, fps: 10, settle: 400 },
       },
     ]),
   ),
