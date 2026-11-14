@@ -1,19 +1,16 @@
-// Films the cards that hold something live: each landing page, the
-// Components preview, and agent office's own demo. A card's frame is drawn
-// as an SVG, the live page (in an iframe) or the demo (a <video>) sits in its
-// slot, and headless Chrome is screenshotted over the DevTools protocol;
-// img2webp (libwebp) makes the frames an animated WebP, light and dark.
+// Films the cards that hold something live: each landing page. A card's
+// frame is drawn as an SVG, the live page (in an iframe) sits in its slot,
+// and headless Chrome is screenshotted over the DevTools protocol; img2webp
+// (libwebp) makes the frames an animated WebP.
 //
 //   npm run media [-- <name prefix>]
 //
-// Needs Google Chrome, img2webp on PATH, and the network for the live pages.
-// agent office's clip is read from sources/agent-office-demo.mp4 (the repo's
-// docs/demo.mp4); fetch it first with `npm run fetch-demo`.
+// Needs Google Chrome (or CHROME=<path>), img2webp on PATH, and the network.
 import { spawn, execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, rmSync, writeFileSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
-import { THEMES } from "./lib.mjs";
+import { T } from "./lib.mjs";
 import { CLIP_CARDS, SLOT } from "./cards.mjs";
 import { page, PAGE_SLOT } from "./sections.mjs";
 
@@ -26,19 +23,6 @@ const DPR = 1.5;
 
 // what plays in each slot
 const CLIPS = {
-  "card-agent-office": {
-    ...CLIP_CARDS["card-agent-office"],
-    size: [600, 520],
-    slot: SLOT,
-    // the demo zooms in on api-gateway as Claude Code flips its table
-    video: { src: here("./sources/agent-office-demo.mp4"), w: 1200, h: 750, crop: { x: 20, y: 18, w: 1040, h: 510 }, from: 17.6, to: 19.9, fps: 15 },
-  },
-  "card-components": {
-    ...CLIP_CARDS["card-components"],
-    size: [600, 520],
-    slot: SLOT,
-    live: { url: "https://bas3line.github.io/Components/preview/server-island/", w: 1200, h: Math.round((1200 * SLOT.h) / SLOT.w), seconds: 6, fps: 10, settle: 400 },
-  },
   ...Object.fromEntries(
     [
       ["nodeny", "https://nodeny.kiraa-7e4.workers.dev", "nodeny", "React, Tailwind, canvas · a Roman marble from The Met"],
@@ -175,7 +159,7 @@ async function film(port, name, clip, mode, t) {
     writeFileSync(png, f.png);
     args.push("-d", String(Math.max(20, f.ms)), png);
   });
-  const dest = join(out, mode === "dark" ? `${name}-dark.webp` : `${name}.webp`);
+  const dest = join(out, `${name}.webp`);
   execFileSync("img2webp", [...args, "-o", dest], { stdio: "ignore" });
   console.log(dest, `${frames.length} frames`, `${(statSync(dest).size / 1024).toFixed(0)} KB`);
 }
@@ -186,7 +170,7 @@ try {
   for (const [name, clip] of Object.entries(CLIPS)) {
     if (only && !name.startsWith(only)) continue;
     if (clip.video && !existsSync(clip.video.src)) throw new Error(`${clip.video.src} is missing: npm run fetch-demo`);
-    for (const [mode, t] of Object.entries(THEMES)) await film(port, name, clip, mode, t);
+    await film(port, name, clip, "eerie", T);
   }
 } finally {
   proc.kill();

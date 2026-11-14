@@ -1,13 +1,14 @@
-// The hero: headline on the left, Rutherfurd's full Moon in ascii on the right.
+// The hero: headline on the left, and on the right a server rack in ascii at
+// 3:14 a.m., the power out, still serving.
 import { doc, panel, paragraph, text, measure, esc } from "./lib.mjs";
-import { moon } from "./art.mjs";
+import { rack } from "./art.mjs";
 
 const W = 1280;
 const H = 780;
 const LINES = ["Fast servers.", "Pretty pages."];
 
 export async function hero(t) {
-  const art = await moon({ cols: 76 });
+  const art = rack();
   let b = "";
 
   // left column
@@ -47,7 +48,7 @@ export async function hero(t) {
 
   // right column: the art panel
   const px = 668, py = 72, pw = 532;
-  const cols = art.cols, rows = art.rows;
+  const cols = art.cols, rows = art.rows.length;
   const innerPad = 30;
   const cw = (pw - innerPad * 2) / cols;
   const ch = cw * 2;
@@ -57,46 +58,49 @@ export async function hero(t) {
   const ax = px + innerPad, ay = py + innerPad;
   const fontSize = (ch * 0.84).toFixed(2);
   const layer = (pred) =>
-    art.grid
-      .map((row, r) => {
+    art.rows
+      .map(({ s: line, m }, r) => {
         let s = "";
-        for (let c = 0; c < cols; c++) s += pred(art.tone[r][c]) ? row[c] : " ";
+        for (let c = 0; c < cols; c++) s += pred(m[c]) ? line[c] : " ";
         if (!s.trim()) return "";
         return `<text x="${ax}" y="${(ay + r * ch + ch / 2).toFixed(1)}" textLength="${(cols * cw).toFixed(1)}" lengthAdjust="spacingAndGlyphs">${esc(s)}</text>`;
       })
       .join("");
-  const lo = (v) => v > 0 && v < 0.32, mid = (v) => v >= 0.32 && v < 0.58, hi = (v) => v >= 0.58;
-  b += `<g class="art" fill="${t.art[0]}">${layer(lo)}</g>`;
-  b += `<g class="art" fill="${t.art[1]}">${layer(mid)}</g>`;
-  b += `<g class="art" fill="${t.art[2]}">${layer(hi)}</g>`;
+  // the frame in ash, vents dim, sleds and ports in bone, the warning in red
+  b += `<g class="art" fill="${t.ink3}">${layer((k) => k === "f")}</g>`;
+  b += `<g class="art" fill="${t.art[0]}">${layer((k) => k === "v")}</g>`;
+  b += `<g class="art" fill="${t.ink2}">${layer((k) => k === "p")}</g>`;
+  b += `<g class="art warn" fill="${t.blue}">${layer((k) => k === "w")}</g>`;
 
-  // a glint sweeps across now and then: the same characters, darker, through a moving band
-  b += `<defs><clipPath id="band"><rect x="${ax - 260}" y="${ay - 40}" width="90" height="${rows * ch + 80}" transform="skewX(-18)"><animate attributeName="x" values="${ax - 400};${ax - 400};${ax + cols * cw + 300}" keyTimes="0;0.55;1" dur="7s" repeatCount="indefinite"/></rect></clipPath></defs>`;
-  b += `<g class="art motion" fill="${t.glint}" clip-path="url(#band)">${layer((v) => v > 0)}</g>`;
-
-  // a few stars in the empty sky, each on its own slow twinkle
+  // the LEDs: power steady, activity flickering at its own pace, the UPS
+  // pulsing red; each with a soft halo
   let seed = 7;
   const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-  let stars = "";
-  for (let k = 0, tries = 0; k < 16 && tries < 400; tries++) {
-    const r = Math.floor(rand() * rows), c = Math.floor(rand() * cols);
-    const clear = [-2, -1, 0, 1, 2].every((dr) => [-3, -2, -1, 0, 1, 2, 3].every((dc) => !(art.tone[r + dr]?.[c + dc] > 0)));
-    if (!clear) continue;
-    const ch0 = rand() > 0.7 ? "+" : rand() > 0.5 ? "*" : ".";
-    stars += `<text class="star" style="animation-delay:-${(rand() * 4).toFixed(2)}s" x="${(ax + c * cw).toFixed(1)}" y="${(ay + r * ch + ch / 2).toFixed(1)}">${ch0}</text>`;
-    k++;
+  let halo = "", dots = "";
+  for (const l of art.leds) {
+    const x = (ax + (l.col + 0.5) * cw).toFixed(1), y = (ay + l.row * ch + ch / 2).toFixed(1);
+    if (l.kind === "pwr") {
+      dots += `<circle cx="${x}" cy="${y}" r="2.2" fill="${t.ink2}"/>`;
+      continue;
+    }
+    const st = l.kind === "warn" ? "" : ` style="animation-duration:${(0.25 + rand() * 1.6).toFixed(2)}s;animation-delay:-${(rand() * 2).toFixed(2)}s"`;
+    const cls = l.kind === "warn" ? "pulse" : "act";
+    halo += `<circle class="${cls}"${st} cx="${x}" cy="${y}" r="6" fill="${t.blue}" opacity=".45"/>`;
+    dots += `<circle class="${cls}"${st} cx="${x}" cy="${y}" r="2.6" fill="${t.blue}"/>`;
   }
-  b += `<g class="art" fill="${t.art[1]}">${stars}</g>`;
+  b += `<defs><filter id="halo" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="3"/></filter></defs>`;
+  b += `<g filter="url(#halo)">${halo}</g>${dots}`;
 
   // caption, as the landing pages do it
   const capY = py + ph + 30;
-  b += text("Lewis Morris Rutherfurd, Full Moon, 1871 · The Met, CC0", { x: px, y: capY, font: "mono", size: 14, fill: t.ink3 }).svg;
-  b += text("Four and a half billion years without downtime.", { x: px, y: capY + 24, font: "mono", size: 14, fill: t.blue }).svg;
+  b += text("Rack 7, 3:14 a.m. The power is out.", { x: px, y: capY, font: "mono", size: 14, fill: t.ink3 }).svg;
+  b += text("It's still serving.", { x: px, y: capY + 24, font: "mono", size: 14, fill: t.blue }).svg;
 
   const style =
     `.art text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:${fontSize}px;white-space:pre;dominant-baseline:central}` +
     `.caret{animation:blink 1.1s steps(1) infinite}@keyframes blink{50%{opacity:0}}` +
-    `.star{animation:twinkle 4s ease-in-out infinite}@keyframes twinkle{0%,100%{opacity:.25}50%{opacity:1}}`;
+    `.act{animation:act 1s steps(1) infinite}@keyframes act{50%{opacity:.08}}` +
+    `.pulse,.warn{animation:pulse 2.4s ease-in-out infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}`;
 
   const height = Math.max(H, capY + 76);
 
@@ -111,7 +115,7 @@ export async function hero(t) {
     w: W,
     h: height,
     t,
-    label: "Fast servers. Pretty pages. Shubham, a systems engineer from Jaipur, beside Rutherfurd's 1871 photograph of the full Moon drawn in ascii.",
+    label: "Fast servers. Pretty pages. Shubham, a systems engineer from Jaipur, beside a server rack drawn in ascii at 3:14 a.m.: the power is out, the UPS is on battery, and it is still serving.",
     style,
     body: frame + b,
   });

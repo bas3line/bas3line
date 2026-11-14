@@ -15,45 +15,26 @@ export const FONTS = {
   monoMedium: load("geist-mono/GeistMono-Medium.ttf"),
 };
 
-export const THEMES = {
-  light: {
-    dark: false,
-    bg: "#ffffff",
-    ink: "#0a0a0a",
-    ink2: "#4d4d4d",
-    ink3: "#8a8d93",
-    line: "#e6e7eb",
-    blue: "#2563eb",
-    blueDeep: "#1d3fae",
-    blueSoft: "#eef3fe",
-    blueLine: "#c9d8fb",
-    tint: "#f6f8fd",
-    card: "#ffffff",
-    dot: "#c9d8fb",
-    pill: "#0a0a0a",
-    pillInk: "#ffffff",
-    art: ["#b7cbf6", "#5b8cf0", "#1d3fae"],
-    glint: "#0a0a0a",
-  },
-  dark: {
-    dark: true,
-    bg: "#0d1117",
-    ink: "#f0f6fc",
-    ink2: "#9198a1",
-    ink3: "#6e7681",
-    line: "#262c36",
-    blue: "#4493f8",
-    blueDeep: "#a5c8ff",
-    blueSoft: "#0f1b30",
-    blueLine: "#1f3760",
-    tint: "#0f1520",
-    card: "#0d1117",
-    dot: "#22406e",
-    pill: "#f0f6fc",
-    pillInk: "#0d1117",
-    art: ["#25426f", "#4a86ea", "#c6dcff"],
-    glint: "#ffffff",
-  },
+// One theme, always dark: bone on a cold black, ash for the quiet parts, and
+// one red. The token names are the old ones, so `blue` is the accent.
+export const T = {
+  dark: true,
+  bg: "#0d1117", // GitHub's own dark page, so the images sit flush on it
+  ink: "#ebe7df",
+  ink2: "#9c968c",
+  ink3: "#635f58",
+  line: "#21262d",
+  blue: "#e5383b",
+  blueDeep: "#ff9a94",
+  blueSoft: "#1c0c0d",
+  blueLine: "#3b1618",
+  tint: "#10141a",
+  card: "#0d1117",
+  dot: "#2e1517",
+  pill: "#ebe7df",
+  pillInk: "#0d1117",
+  art: ["#4a4640", "#8f897f", "#ebe7df"],
+  glint: "#e5383b",
 };
 
 const r1 = (n) => Math.round(n * 10) / 10;
@@ -184,7 +165,7 @@ export function chip(label, t, { x, y, size = 14, h = 30, pad = 12, fill, stroke
   const w = tw + pad * 2 + icon + gap;
   let svg = `<rect x="${r1(x)}" y="${y}" width="${r1(w)}" height="${h}" rx="${h / 2}" fill="${fill ?? t.card}" stroke="${stroke ?? t.line}"/>`;
   if (href) svg += image(href, x + pad - 1, y + (h - icon) / 2, icon);
-  if (l.star) svg += star(x + pad - 1 + icon / 2, y + h / 2, icon / 2, t.dark ? "#e3b341" : "#d4a72c");
+  if (l.star) svg += star(x + pad - 1 + icon / 2, y + h / 2, icon / 2, t.blue);
   svg += text(l.text, { x: x + pad + icon + gap, y: y + h / 2 + size * 0.36, size, font, fill: ink ?? t.ink2 }).svg;
   return { svg, width: w };
 }

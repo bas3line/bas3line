@@ -2,7 +2,7 @@
 // and a framed panel with a small moving picture of the thing.
 import { svg as asciiSvg, namespaced, MONO, FACES } from "ascii.rest/svg";
 import { donut } from "ascii.rest/pieces";
-import { chips, doc, esc, measure, panel, paragraph, text } from "./lib.mjs";
+import { chips, doc, esc, measure, panel, paragraph, r1, text } from "./lib.mjs";
 
 const W = 600;
 const H = 520;
@@ -173,10 +173,10 @@ function brailleFrames({ cols, rows, frames }) {
 function tplayVisual(t, box) {
   let s = "";
   const wx = box.x + 16, wy = box.y + 14, ww = box.w - 32, wh = box.h - 28;
-  const term = "#0b0f14";
-  s += `<rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" rx="10" fill="${term}" stroke="${t.dark ? "#30363d" : "#1f2328"}"/>`;
-  for (const [i, c] of ["#ff5f57", "#febc2e", "#28c840"].entries()) s += `<circle cx="${wx + 16 + i * 15}" cy="${wy + 14}" r="4.5" fill="${c}"/>`;
-  s += text("tplay clip.mp4 --dots", { x: wx + ww / 2, y: wy + 18, font: "mono", size: 12, fill: "#8b949e", anchor: "middle" }).svg;
+  const term = "#050506";
+  s += `<rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" rx="10" fill="${term}" stroke="${t.line}"/>`;
+  for (const [i, c] of [t.blue, t.ink3, t.ink3].entries()) s += `<circle cx="${wx + 16 + i * 15}" cy="${wy + 14}" r="4.5" fill="${c}"/>`;
+  s += text("tplay clip.mp4 --dots", { x: wx + ww / 2, y: wy + 18, font: "mono", size: 12, fill: t.ink3, anchor: "middle" }).svg;
 
   const cols = 64, rows = 8, frames = 8, every = 2.4;
   const fr = brailleFrames({ cols, rows, frames });
@@ -184,23 +184,23 @@ function tplayVisual(t, box) {
   for (const [i, lines] of fr.entries()) {
     s += `<g class="bf bf${i}" style="animation-delay:${(-every + (i * every) / frames).toFixed(3)}s">`;
     for (const [r, line] of lines.entries()) {
-      const color = r < 4 ? "#a5c8ff" : "#4493f8";
+      const color = r < 4 ? t.ink : t.ink2;
       s += `<text x="${gx}" y="${gy + r * rh + rh / 2}" textLength="${gw}" lengthAdjust="spacingAndGlyphs" fill="${color}">${esc(line)}</text>`;
     }
     s += `</g>`;
   }
   // the player's bar: play, a scrubber, the time, and the picture modes
   const by = wy + wh - 22;
-  s += `<path d="M${gx} ${by - 5}l9 5l-9 5z" fill="#e6edf3"/>`;
+  s += `<path d="M${gx} ${by - 5}l9 5l-9 5z" fill="${t.ink}"/>`;
   const tx0 = gx + 22, tw = 140;
-  s += `<rect x="${tx0}" y="${by - 1.5}" width="${tw}" height="3" rx="1.5" fill="#30363d"/><rect class="scrub" x="${tx0}" y="${by - 1.5}" width="${tw}" height="3" rx="1.5" fill="#4493f8"/>`;
-  s += text("0:12 / 1:04", { x: tx0 + tw + 12, y: by + 4.5, font: "mono", size: 12, fill: "#8b949e" }).svg;
+  s += `<rect x="${tx0}" y="${by - 1.5}" width="${tw}" height="3" rx="1.5" fill="${t.line}"/><rect class="scrub" x="${tx0}" y="${by - 1.5}" width="${tw}" height="3" rx="1.5" fill="${t.blue}"/>`;
+  s += text("0:12 / 1:04", { x: tx0 + tw + 12, y: by + 4.5, font: "mono", size: 12, fill: t.ink3 }).svg;
   let mx = gx + gw;
   for (const m of ["ascii", "braille", "half"]) {
     const w = measure(m, { font: "mono", size: 12 });
     mx -= w;
-    if (m === "braille") s += `<rect x="${mx - 6}" y="${by - 10}" width="${w + 12}" height="20" rx="5" fill="#1f3760"/>`;
-    s += text(m, { x: mx, y: by + 4.5, font: "mono", size: 12, fill: m === "braille" ? "#a5c8ff" : "#6e7681" }).svg;
+    if (m === "braille") s += `<rect x="${mx - 6}" y="${by - 10}" width="${w + 12}" height="20" rx="5" fill="${t.blueSoft}"/>`;
+    s += text(m, { x: mx, y: by + 4.5, font: "mono", size: 12, fill: m === "braille" ? t.blue : t.ink3 }).svg;
     mx -= 18;
   }
   const style =
@@ -208,6 +208,112 @@ function tplayVisual(t, box) {
     `.bf{opacity:0;animation:bf ${every}s step-end infinite}.bf0{opacity:1}@keyframes bf{0%{opacity:1}${(100 / frames).toFixed(3)}%,100%{opacity:0}}` +
     `.scrub{transform-box:fill-box;transform-origin:left;animation:scrub 12s linear infinite}@keyframes scrub{0%{transform:scaleX(.08)}100%{transform:scaleX(1)}}`;
   return { svg: s, style };
+}
+
+// ---------------------------------------------------------------- packets
+// an HTTP request off the wire, as the live hexdump shows it, scrolling
+function packetsVisual(t, box) {
+  let s = "";
+  const x0 = box.x + 20;
+  s += `<circle class="rec" cx="${x0 + 5}" cy="${box.y + 25}" r="4.5" fill="${t.blue}"/>`;
+  s += text("capturing on eth0", { x: x0 + 18, y: box.y + 30, font: "mono", size: 13.5, fill: t.ink2 }).svg;
+  s += text("3 clients watching", { x: box.x + box.w - 20, y: box.y + 30, font: "mono", size: 13.5, fill: t.ink3, anchor: "end" }).svg;
+  const payload = "GET /admin HTTP/1.1\r\nHost: 10.0.0.7\r\nAuthorization: Basic YWRtaW46aHVudGVyMg==\r\nUser-Agent: curl/8.4\r\n\r\n";
+  const head = [0x45, 0, 0, 0x8c, 0x1c, 0x46, 0x40, 0, 0x40, 6, 0xa6, 0xec, 10, 0, 0, 0x2a, 10, 0, 0, 7, 0xd4, 0x31, 0, 0x50, 0x9f, 0x22, 0x0b, 0x7e, 0, 0, 0, 0, 0x50, 0x18, 0xfa, 0xf0, 0x3c, 0x1d, 0, 0];
+  const bytes = [...head, ...[...payload].map((c) => c.charCodeAt(0))];
+  const rows = [];
+  for (let i = 0; i < bytes.length; i += 16) rows.push(bytes.slice(i, i + 16));
+  const n = 8, lh = 22, size = 12.5;
+  const adv = measure("0", { font: "mono", size });
+  const gy = box.y + 52;
+  // real <text> in the reader's monospace face, not outlines: 22 rows of
+  // hex as paths would weigh half a megabyte
+  const line = (row, k, y) => {
+    const secret = (j) => k * 16 + j >= head.length + 54 && k * 16 + j < head.length + 86;
+    let hex = "";
+    for (let j = 0; j < row.length; ) {
+      let e = j;
+      while (e < row.length && secret(e) === secret(j)) e++;
+      const run = row.slice(j, e).map((v, q) => v.toString(16).padStart(2, "0") + (j + q === 7 ? "  " : " ")).join("");
+      hex += secret(j) ? `<tspan fill="${t.blue}">${run}</tspan>` : run;
+      j = e;
+    }
+    const asc = esc(row.map((v) => (v >= 32 && v < 127 ? String.fromCharCode(v) : ".")).join(""));
+    return (
+      `<text x="${x0}" y="${y}" fill="${t.ink3}">${(k * 16).toString(16).padStart(4, "0")}</text>` +
+      `<text x="${r1(x0 + adv * 6)}" y="${y}" fill="${t.ink2}" textLength="${r1(adv * 48)}" lengthAdjust="spacingAndGlyphs">${hex}</text>` +
+      `<text x="${r1(x0 + adv * 56)}" y="${y}" fill="${t.ink3}" textLength="${r1(adv * row.length)}" lengthAdjust="spacingAndGlyphs">${asc}</text>`
+    );
+  };
+  let g = "";
+  const all = [...rows, ...rows];
+  all.forEach((row, i) => (g += line(row, i % rows.length, gy + 14 + i * lh)));
+  s += `<defs><clipPath id="hx"><rect x="${box.x}" y="${gy}" width="${box.w}" height="${n * lh}"/></clipPath></defs>`;
+  s += `<g clip-path="url(#hx)" class="hxt"><g class="hx">${g}</g></g>`;
+  s += text("the password went by in the clear", { x: x0, y: box.y + box.h - 8, size: 14, fill: t.ink3 }).svg;
+  const style =
+    `.hxt text{font-family:${FACES};font-size:${size}px;white-space:pre}` +
+    `.rec{animation:rec 1.2s steps(1) infinite}@keyframes rec{50%{opacity:.2}}` +
+    `.hx{animation:hx ${rows.length * 0.7}s steps(${rows.length}) infinite}@keyframes hx{to{transform:translateY(-${rows.length * lh}px)}}`;
+  return { svg: s, style };
+}
+
+// ---------------------------------------------------------------- honeypot
+// who knocked on :2222 tonight, and what they tried
+function honeypotVisual(t, box) {
+  let s = "";
+  const x0 = box.x + 20, x1 = box.x + box.w - 20;
+  s += text("listening on :2222", { x: x0, y: box.y + 30, font: "mono", size: 13.5, fill: t.ink2 }).svg;
+  s += text("every attempt logged", { x: x1, y: box.y + 30, font: "mono", size: 13.5, fill: t.ink3, anchor: "end" }).svg;
+  s += `<path d="M${x0} ${box.y + 46}H${x1}" stroke="${t.line}"/>`;
+  const tries = [
+    ["03:14:07", "203.0.113.42", "root", "123456"],
+    ["03:14:09", "198.51.100.7", "admin", "admin"],
+    ["03:14:15", "192.0.2.199", "pi", "raspberry"],
+    ["03:14:22", "203.0.113.250", "root", "toor"],
+    ["03:14:31", "198.51.100.66", "oracle", "oracle"],
+    ["03:14:40", "192.0.2.13", "ubuntu", "ubuntu"],
+  ];
+  tries.forEach(([time, ip, user, pass], i) => {
+    const y = box.y + 76 + i * 29;
+    let r = text(time, { x: x0, y, font: "mono", size: 13, fill: t.ink3 }).svg;
+    r += text(ip, { x: x0 + 82, y, font: "mono", size: 13, fill: t.ink2 }).svg;
+    r += text(`${user} / ${pass}`, { x: x0 + 216, y, font: "mono", size: 13, fill: t.ink }).svg;
+    r += text("let in", { x: x1, y, font: "mono", size: 13, fill: t.blue, anchor: "end" }).svg;
+    s += `<g class="try try${i}">${r}</g>`;
+  });
+  // all there at first sight; then the night starts over, one knock at a time
+  const style =
+    `.try{animation:10s linear infinite}` +
+    tries.map((_, i) => `.try${i}{animation-name:try${i}}@keyframes try${i}{0%,60%{opacity:1}62%,${64 + i * 5}%{opacity:0}${65 + i * 5}%,100%{opacity:1}}`).join("");
+  return { svg: s, style };
+}
+
+// ---------------------------------------------------------------- ultrabalancer
+// requests come in on the left and go round the four backends in turn
+function ultrabalancerVisual(t, box) {
+  let s = "";
+  const cy = box.y + box.h / 2 - 12;
+  const inX = box.x + 46, lbX = box.x + 200, beX = box.x + 352;
+  const backs = [0, 1, 2, 3].map((k) => ({ y: cy - 84 + k * 56, name: `10.0.1.${10 + k}:8080` }));
+  s += `<circle cx="${inX}" cy="${cy}" r="22" fill="${t.card}" stroke="${t.line}"/>`;
+  s += text(":443", { x: inX, y: cy + 4.5, font: "mono", size: 12.5, fill: t.ink2, anchor: "middle" }).svg;
+  s += `<path d="M${inX + 22} ${cy}H${lbX - 58}" stroke="${t.line}"/>`;
+  s += `<rect x="${lbX - 58}" y="${cy - 22}" width="116" height="44" rx="8" fill="${t.blueSoft}" stroke="${t.blue}"/>`;
+  s += text("round-robin", { x: lbX, y: cy + 4.5, font: "mono", size: 12.5, fill: t.blue, anchor: "middle" }).svg;
+  let dots = "";
+  backs.forEach((b, k) => {
+    const d = `M${lbX + 58} ${cy}C${lbX + 100} ${cy} ${beX - 50} ${b.y} ${beX - 8} ${b.y}`;
+    s += `<path d="${d}" stroke="${t.line}"/>`;
+    s += `<rect x="${beX - 8}" y="${b.y - 15}" width="166" height="30" rx="6" fill="${t.card}" stroke="${t.line}"/>`;
+    s += `<circle cx="${beX + 6}" cy="${b.y}" r="3.5" fill="${t.ink2}"/>`;
+    s += text(b.name, { x: beX + 18, y: b.y + 4.5, font: "mono", size: 12.5, fill: t.ink2 }).svg;
+    const path = `M${inX + 22} ${cy}H${lbX + 58}C${lbX + 100} ${cy} ${beX - 50} ${b.y} ${beX - 8} ${b.y}`;
+    dots += `<circle r="3.5" fill="${t.ink}" opacity="0"><animateMotion path="${path}" dur="1.2s" begin="${k * 0.6}s;dot${k}.end+1.2s" id="dot${k}" fill="remove"/><set attributeName="opacity" to="1" begin="dot${k}.begin" end="dot${k}.end"/></circle>`;
+  });
+  s += `<g class="motion">${dots}</g>`;
+  s += text("~850k requests a second on an M4 Pro", { x: box.x + 20, y: box.y + box.h - 8, size: 14, fill: t.ink3 }).svg;
+  return { svg: s };
 }
 
 // ---------------------------------------------------------------- stars
@@ -226,6 +332,9 @@ const empty = () => ({ svg: "" });
 
 const TS = { text: "TypeScript", logo: "typescript" };
 
+const C = { text: "C", logo: "c" };
+const RUST = { text: "Rust", logo: "rust" };
+
 export const CARDS = {
   "card-ascii": async (t) =>
     card(t, {
@@ -238,7 +347,7 @@ export const CARDS = {
     }),
   "card-airsec": (t) =>
     card(t, {
-      n: "03",
+      n: "02",
       title: "airsec",
       desc: "Security review driven by the coding CLI you already have. No new API key, no cloud upload.",
       tags: [TS, { text: "Node 20+", logo: "nodejs" }, "npx airsec"],
@@ -247,19 +356,46 @@ export const CARDS = {
     }),
   "card-gopher": (t) =>
     card(t, {
-      n: "04",
+      n: "03",
       title: "Gopher",
       desc: "An AI Discord bot with long-term memory, web research, vision and voice replies.",
       tags: [TS, { text: "Bun", logo: "bun" }, { text: "pgvector", logo: "postgresql" }],
       label: "Gopher: an AI Discord bot that remembers",
       visual: gopherVisual,
     }),
-  "card-tplay": (t) =>
+  "card-packets": (t) =>
+    card(t, {
+      n: "04",
+      title: "packets",
+      desc: "A remote packet sniffer on raw sockets: live hexdump and stats, streamed to many clients at once.",
+      tags: [C, "raw sockets", "multi-client"],
+      label: "packets: a remote packet sniffer, here catching a password in a plain HTTP request",
+      visual: packetsVisual,
+    }),
+  "card-honeypot": (t) =>
     card(t, {
       n: "05",
+      title: "honeypot",
+      desc: "An SSH server that lets attackers in to a shell that isn't real, and logs every password and command.",
+      tags: [RUST, { text: "Docker", logo: "docker" }, "JSON logs"],
+      label: "honeypot: an SSH honeypot logging login attempts",
+      visual: honeypotVisual,
+    }),
+  "card-ultrabalancer": async (t) =>
+    card(t, {
+      n: "06",
+      title: "ultrabalancer",
+      desc: "A load balancer in Rust, built for the day connection counts stop being friendly.",
+      tags: [RUST, { text: `${await stars("bas3line/ultrabalancer")} stars`, star: true }, "ultrabalancer.com"],
+      label: "ultrabalancer: a Rust load balancer sending requests round-robin to four backends",
+      visual: ultrabalancerVisual,
+    }),
+  "card-tplay": (t) =>
+    card(t, {
+      n: "07",
       title: "tplay",
       desc: "Play videos in your terminal, with sound: half-block colour, dithered braille dots, or ascii.",
-      tags: [{ text: "Rust", logo: "rust" }, { text: "ffmpeg", logo: "ffmpeg" }, "3 picture modes"],
+      tags: [RUST, { text: "ffmpeg", logo: "ffmpeg" }, "3 picture modes"],
       label: "tplay: video in the terminal, drawn in braille dots",
       visual: tplayVisual,
     }),
@@ -267,29 +403,4 @@ export const CARDS = {
 
 // cards whose panel holds a recorded clip: media.mjs draws these frames and
 // films the clip into SLOT
-export const CLIP_CARDS = {
-  "card-agent-office": {
-    frame: (t) =>
-      card(t, {
-        n: "02",
-        title: "agent office",
-        desc: "Your coding agents working in a live pixel-art office: Claude Code, Codex, Command Code and five more.",
-        tags: [TS, "local or sandboxed", "npx theagentoffice"],
-        label: "agent office: coding agents as pixel-art workers at desks",
-        visual: empty,
-      }),
-    alt: "agent office: Claude Code flips a table in the pixel office when a test fails",
-  },
-  "card-components": {
-    frame: (t) =>
-      card(t, {
-        n: "06",
-        title: "Components",
-        desc: "React components drawn in code: isometric servers, racks, terminals and maps. Copy a folder and make it yours.",
-        tags: [{ text: "React", logo: "react" }, { text: "Tailwind", logo: "tailwind" }, "10 components"],
-        label: "Components: React components drawn in code",
-        visual: empty,
-      }),
-    alt: "Components: a server on an island of its own, drawn in SVG and CSS",
-  },
-};
+export const CLIP_CARDS = {};
