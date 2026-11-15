@@ -27,7 +27,7 @@
   <a href="https://github.com/bas3line/ascii"><img alt="ascii: animated ascii art for web pages, in TypeScript" src="assets/readme/card-ascii.svg" width="49%"></a>
   <a href="https://github.com/bas3line/Airsec"><img alt="airsec: security review driven by the coding CLI you already have" src="assets/readme/card-airsec.svg" width="49%"></a>
   <a href="https://github.com/bas3line/Gopher"><img alt="Gopher: an AI Discord bot with long-term memory, web research, vision and voice" src="assets/readme/card-gopher.svg" width="49%"></a>
-  <a href="https://github.com/bas3line/packets"><img alt="packets: a remote packet sniffer on raw sockets, with a live hexdump streamed to many clients" src="assets/readme/card-packets.svg" width="49%"></a>
+  <a href="https://github.com/bas3line/packets"><img alt="packets: a remote packet sniffer that captures on a server, decodes on your laptop and keeps the .pcap" src="assets/readme/card-packets.svg" width="49%"></a>
   <a href="https://github.com/bas3line/honeypot"><img alt="honeypot: an SSH honeypot in Rust that logs every password and command attackers try" src="assets/readme/card-honeypot.svg" width="49%"></a>
   <a href="https://github.com/bas3line/ultrabalancer"><img alt="ultrabalancer: a load balancer in Rust" src="assets/readme/card-ultrabalancer.svg" width="49%"></a>
 </p>
