@@ -211,50 +211,58 @@ function tplayVisual(t, box) {
 }
 
 // ---------------------------------------------------------------- packets
-// an HTTP request off the wire, as the live hexdump shows it, scrolling
+// the client's side of it: a server's traffic arriving decoded, one line a
+// packet, with the names it could read off the wire (DNS questions, TLS SNI)
 function packetsVisual(t, box) {
   let s = "";
-  const x0 = box.x + 20;
-  s += `<circle class="rec" cx="${x0 + 5}" cy="${box.y + 25}" r="4.5" fill="${t.blue}"/>`;
-  s += text("capturing on eth0", { x: x0 + 18, y: box.y + 30, font: "mono", size: 13.5, fill: t.ink2 }).svg;
-  s += text("3 clients watching", { x: box.x + box.w - 20, y: box.y + 30, font: "mono", size: 13.5, fill: t.ink3, anchor: "end" }).svg;
-  const payload = "GET /admin HTTP/1.1\r\nHost: 10.0.0.7\r\nAuthorization: Basic YWRtaW46aHVudGVyMg==\r\nUser-Agent: curl/8.4\r\n\r\n";
-  const head = [0x45, 0, 0, 0x8c, 0x1c, 0x46, 0x40, 0, 0x40, 6, 0xa6, 0xec, 10, 0, 0, 0x2a, 10, 0, 0, 7, 0xd4, 0x31, 0, 0x50, 0x9f, 0x22, 0x0b, 0x7e, 0, 0, 0, 0, 0x50, 0x18, 0xfa, 0xf0, 0x3c, 0x1d, 0, 0];
-  const bytes = [...head, ...[...payload].map((c) => c.charCodeAt(0))];
-  const rows = [];
-  for (let i = 0; i < bytes.length; i += 16) rows.push(bytes.slice(i, i + 16));
-  const n = 8, lh = 22, size = 12.5;
+  const x0 = box.x + 20, x1 = box.x + box.w - 20;
+  s += text("$", { x: x0, y: box.y + 30, font: "mono", size: 13, fill: t.ink3 }).svg;
+  s += text("pktsniff-client 203.0.113.10 -F 'tls or dns' -w out.pcap", { x: x0 + 16, y: box.y + 30, font: "mono", size: 13, fill: t.ink2 }).svg;
+  s += `<circle class="rec" cx="${x1 - 5}" cy="${box.y + 25.5}" r="4.5" fill="${t.blue}"/>`;
+  s += `<path d="M${x0} ${box.y + 46}H${x1}" stroke="${t.line}"/>`;
+  // label, addresses, then what the dissector made of the payload; the name
+  // in it is the part worth reading, so that is what the accent marks
+  const me = "10.0.0.5", dns = "1.1.1.1:53";
+  const ask = (port, q) => ["UDP", `${me}:${port} -> ${dns}`, `DNS ${q.split(" ")[0]} `, q.split(" ")[1]];
+  const answer = (port, q) => ["UDP", `${dns} -> ${me}:${port}`, `DNS(r) ${q.split(" ")[0]} `, q.split(" ")[1]];
+  const hello = (port, ip, name) => ["TCP", `${me}:${port} -> ${ip}:443`, "TLS SNI=", name];
+  const shake = (port, ip) => ["TCP", `${ip}:443 -> ${me}:${port}`, "TLS handshake", ""];
+  const rows = [
+    ask(40233, "A github.com"),
+    answer(40233, "A github.com"),
+    hello(53112, "140.82.112.3", "github.com"),
+    shake(53112, "140.82.112.3"),
+    ask(51907, "AAAA ascii.rest"),
+    answer(51907, "AAAA ascii.rest"),
+    hello(41870, "104.21.48.7", "ascii.rest"),
+    shake(41870, "104.21.48.7"),
+    ask(38114, "A api.github.com"),
+    hello(36402, "140.82.113.6", "api.github.com"),
+    ask(47021, "HTTPS cloudflare.com"),
+    hello(44790, "1.1.1.1", "one.one.one.one"),
+  ];
+  const n = 7, lh = 24, size = 12;
   const adv = measure("0", { font: "mono", size });
-  const gy = box.y + 52;
-  // real <text> in the reader's monospace face, not outlines: 22 rows of
-  // hex as paths would weigh half a megabyte
-  const line = (row, k, y) => {
-    const secret = (j) => k * 16 + j >= head.length + 54 && k * 16 + j < head.length + 86;
-    let hex = "";
-    for (let j = 0; j < row.length; ) {
-      let e = j;
-      while (e < row.length && secret(e) === secret(j)) e++;
-      const run = row.slice(j, e).map((v, q) => v.toString(16).padStart(2, "0") + (j + q === 7 ? "  " : " ")).join("");
-      hex += secret(j) ? `<tspan fill="${t.blue}">${run}</tspan>` : run;
-      j = e;
-    }
-    const asc = esc(row.map((v) => (v >= 32 && v < 127 ? String.fromCharCode(v) : ".")).join(""));
-    return (
-      `<text x="${x0}" y="${y}" fill="${t.ink3}">${(k * 16).toString(16).padStart(4, "0")}</text>` +
-      `<text x="${r1(x0 + adv * 6)}" y="${y}" fill="${t.ink2}" textLength="${r1(adv * 48)}" lengthAdjust="spacingAndGlyphs">${hex}</text>` +
-      `<text x="${r1(x0 + adv * 56)}" y="${y}" fill="${t.ink3}" textLength="${r1(adv * row.length)}" lengthAdjust="spacingAndGlyphs">${asc}</text>`
-    );
-  };
+  const gy = box.y + 54;
+  // real <text> in the reader's monospace face, not outlines: two dozen
+  // lines of packets as paths would weigh a few hundred kilobytes. Every
+  // run is pinned to Geist Mono's width, so the columns hold in any face
+  const run = (str, col, y, fill, inner = esc(str)) =>
+    `<text x="${r1(x0 + adv * col)}" y="${y}" fill="${fill}" textLength="${r1(adv * str.length)}" lengthAdjust="spacingAndGlyphs">${inner}</text>`;
+  const line = ([proto, addr, app, name], y) =>
+    run(proto, 0, y, t.ink) +
+    run(addr, 5, y, t.ink2) +
+    run(app + name, 41, y, t.ink2, esc(app) + (name ? `<tspan fill="${t.blue}">${esc(name)}</tspan>` : ""));
   let g = "";
-  const all = [...rows, ...rows];
-  all.forEach((row, i) => (g += line(row, i % rows.length, gy + 14 + i * lh)));
-  s += `<defs><clipPath id="hx"><rect x="${box.x}" y="${gy}" width="${box.w}" height="${n * lh}"/></clipPath></defs>`;
-  s += `<g clip-path="url(#hx)" class="hxt"><g class="hx">${g}</g></g>`;
-  s += text("the password went by in the clear", { x: x0, y: box.y + box.h - 8, size: 14, fill: t.ink3 }).svg;
+  // twice over, so the loop's last step lands on a window like its first
+  [...rows, ...rows].forEach((row, i) => (g += line(row, gy + 16 + i * lh)));
+  s += `<defs><clipPath id="pk"><rect x="${box.x}" y="${gy}" width="${box.w}" height="${n * lh}"/></clipPath></defs>`;
+  s += `<g clip-path="url(#pk)" class="pkt"><g class="pk">${g}</g></g>`;
+  s += text("who the box is talking to, and a .pcap to prove it", { x: x0, y: box.y + box.h - 8, size: 14, fill: t.ink3 }).svg;
   const style =
-    `.hxt text{font-family:${FACES};font-size:${size}px;white-space:pre}` +
+    `.pkt text{font-family:${FACES};font-size:${size}px;white-space:pre}` +
     `.rec{animation:rec 1.2s steps(1) infinite}@keyframes rec{50%{opacity:.2}}` +
-    `.hx{animation:hx ${rows.length * 0.7}s steps(${rows.length}) infinite}@keyframes hx{to{transform:translateY(-${rows.length * lh}px)}}`;
+    `.pk{animation:pk ${r1(rows.length * 0.9)}s steps(${rows.length}) infinite}@keyframes pk{to{transform:translateY(-${rows.length * lh}px)}}`;
   return { svg: s, style };
 }
 
@@ -367,9 +375,9 @@ export const CARDS = {
     card(t, {
       n: "04",
       title: "packets",
-      desc: "A remote packet sniffer on raw sockets: live hexdump and stats, streamed to many clients at once.",
-      tags: [C, "raw sockets", "multi-client"],
-      label: "packets: a remote packet sniffer, here catching a password in a plain HTTP request",
+      desc: "A remote packet sniffer: capture on a server, read it decoded on your laptop, keep the .pcap for Wireshark.",
+      tags: [C, "raw sockets", "kernel BPF", ".pcap + JSON"],
+      label: "packets: a remote packet sniffer, here naming a server's DNS lookups and TLS connections as they happen",
       visual: packetsVisual,
     }),
   "card-honeypot": (t) =>
